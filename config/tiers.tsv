@@ -1,0 +1,10 @@
+tier	ptv_consequences	gnomad_af_lt	kgp_eur_ac_lte	require_loftee_hc	require_cadd_gt	require_not_last_exon_or_intron	pli_min	description
+broad_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	0	0	0		rare broad PTV
+broad_ptv_gnomad1e4_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.0001	1	0	0	0		rare broad PTV AF 1e-4
+broad_ptv_gnomad1e5_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.00001	1	0	0	0		rare broad PTV AF 1e-5
+loftee_hc_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	1	0	1		rare LOFTEE HC PTV
+gardner_core_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	1	25	1		Gardner-style core rare PTV with CADD v1.7
+gardner_core_ptv_gnomad1e4_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.0001	1	1	25	1		Gardner-style core rare PTV AF 1e-4
+gardner_core_ptv_gnomad1e5_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.00001	1	1	25	1		Gardner-style core rare PTV AF 1e-5
+rare_pli30_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	0	0	0	0.3	rare broad PTV in pLI > 0.3 genes
+modern_pli90_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	1	25	1	0.9	Gardner-style constrained-gene sensitivity tier

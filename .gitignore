@@ -1,0 +1,30 @@
+
+reference/
+
+# Large/generated pipeline state
+downloads/
+resources/
+work/
+results/
+logs/
+tools/
+
+# Keep tiny public summaries here when wanted; ignore generated bulk files.
+outputs/*.tsv
+outputs/*.tsv.gz
+outputs/*.json
+outputs/*.png
+
+# Python/runtime noise
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Local machine/editor files
+.DS_Store
+*.swp
+*.swo
