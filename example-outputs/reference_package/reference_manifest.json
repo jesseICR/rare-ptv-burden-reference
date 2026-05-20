@@ -1,0 +1,58 @@
+{
+  "cadd_version": "1.7",
+  "checksums": [
+    {
+      "bytes": 311,
+      "path": "example-outputs/reference_package/tool_versions.tsv",
+      "sha256": "e8bec324852768e7ecc7deeaa646a3243dc366c2524fcdfca923ac944863b3a8"
+    },
+    {
+      "bytes": 2168,
+      "path": "example-outputs/reference_package/tiers.tsv",
+      "sha256": "e6a01823d87c30057e047229e81df2df1535a470e61d7896e367d3db1415e856"
+    },
+    {
+      "bytes": 7387751,
+      "path": "example-outputs/reference_package/gene_scores_shet_constraint_expression.tsv",
+      "sha256": "ee69e1e4610f83f4b0e5d3d3938ba65b821f298eff3e0109895ed5c767624f82"
+    },
+    {
+      "bytes": 496546,
+      "path": "example-outputs/reference_package/qualifying_variants_by_tier.tsv.gz",
+      "sha256": "c8c537ab717aa6f5dc4d994d54915dd7d1bf21f7972d656aab784338945a11b3"
+    },
+    {
+      "bytes": 167331,
+      "path": "example-outputs/reference_package/burden_by_sample.tsv.gz",
+      "sha256": "f542e94d2eb07e278e0fdd4907ef86543b9f16b76365170567912399df1039df"
+    },
+    {
+      "bytes": 3117,
+      "path": "example-outputs/reference_package/reference_distribution.tier_summary.tsv",
+      "sha256": "a2baed6a6417b6f25cedae88c4638bc9fd2c9bef89bbdb6d851b67ae33d0fac1"
+    },
+    {
+      "bytes": 16368,
+      "path": "example-outputs/reference_package/reference_distribution.top_carriers.tsv",
+      "sha256": "407b7d7ae896e0a147fb5a099514222964ecbae830324e7c18465f6ca56f970b"
+    },
+    {
+      "bytes": 10316,
+      "path": "example-outputs/reference_package/reference_distribution.summary.json",
+      "sha256": "7b249270daf47706e2285d0f0d70b60c21fe9ca57722134638f8bf1094b3e970"
+    },
+    {
+      "bytes": 1005,
+      "path": "example-outputs/reference_package/README.md",
+      "sha256": "7d21d53980c7d67a62edec2e279fdd9a068b64ca1f9a98937985e23287091bc2"
+    }
+  ],
+  "chromosomes": "1-22",
+  "created_utc": "2026-05-20T20:47:34.297456+00:00",
+  "genome_build": "GRCh38",
+  "gnomad_input_name": "gnomad",
+  "gnomad_version": "4.1",
+  "kgp_input_name": "1000g",
+  "note": "Research reference distribution; not a validated clinical score.",
+  "ptv_tiers": "tiers.tsv"
+}

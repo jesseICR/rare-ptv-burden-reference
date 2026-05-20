@@ -37,6 +37,9 @@ def passes_tier(row: dict[str, str], tier: dict[str, str], gene: dict[str, str])
     if max_af is not None and (af is None or af >= max_af):
         return False
 
+    if truthy(tier.get("require_gnomad_absent")) and row.get("gnomad_observed") != "0":
+        return False
+
     if truthy(tier.get("require_loftee_hc")) and row.get("loftee_lof") != "HC":
         return False
 

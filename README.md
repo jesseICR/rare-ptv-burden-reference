@@ -8,6 +8,34 @@ without changing the reference-panel computation.
 
 The workflow is intentionally idempotent: each stage writes a completion sentinel under `work/.done/`, so rerunning the same command skips completed work unless `--force` is supplied.
 
+## Motivation
+
+Large biobank exome studies suggest that rare damaging coding variants add
+phenotypic information beyond common-variant polygenic scores. Chen et al.
+showed that cognitive-function polygenic scores and carrier status for rare PTVs
+or damaging missense variants in pLI > 0.9 genes have additive associations with
+educational attainment and verbal-numerical reasoning.
+
+<p align="center">
+  <img src="https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41588-023-01398-8/MediaObjects/41588_2023_1398_Fig5_HTML.png" alt="Chen et al. figure showing additive contributions of cognitive-function polygenic score and rare damaging coding variant carrier status to educational attainment and verbal-numerical reasoning" width="850">
+</p>
+
+<p align="center"><em>Chen et al. 2023, Fig. 5: common-variant PRS and rare PTV or damaging missense carrier status contribute additively to EDU and VNR.</em></p>
+
+Tian et al. similarly showed that depression prevalence increases with
+polygenic risk score and is higher among carriers of rare PTVs or damaging
+missense variants, supporting a joint common-plus-rare architecture.
+
+<p align="center">
+  <img src="https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41467-024-45774-2/MediaObjects/41467_2024_45774_Fig3_HTML.png" alt="Tian et al. figure showing depression prevalence across PRS percentiles stratified by rare PTV or damaging missense carrier status" width="850">
+</p>
+
+<p align="center"><em>Tian et al. 2024, Fig. 3: depression risk varies with PRS percentile and rare damaging coding-variant carrier status.</em></p>
+
+This repository builds a reproducible 1000G EUR reference distribution for rare
+PTV burden so downstream analyses can compare rare-variant burden against a
+stable public reference panel.
+
 ## Quick Start
 
 Run a chr22 smoke test against an existing local gnomAD v4.1 joint VCF directory:
@@ -125,7 +153,10 @@ Key tiers include:
 
 - `broad_ptv_gnomad1e3_ac1`: stop gained, frameshift, splice donor, or splice acceptor; gnomAD AF < 1e-3; 1000G unrelated EUR AC <= 1.
 - `loftee_hc_ptv_gnomad1e3_ac1`: broad PTV plus LOFTEE high confidence.
-- `gardner_core_ptv_gnomad1e3_ac1`: LOFTEE high confidence, CADD v1.7 PHRED > 25, not last exon/intron, gnomAD AF < 1e-3, and 1000G unrelated EUR AC <= 1.
+- `chen_broad_ptv_gnomad1e5_ac1_pli90`: broad PTV, gnomAD AF < 1e-5, 1000G unrelated EUR AC <= 1, and pLI >= 0.9.
+- `hc_ptv_gnomad1e5_ac1_pli90`: LOFTEE high-confidence PTV, gnomAD AF < 1e-5, 1000G unrelated EUR AC <= 1, and pLI >= 0.9.
+- `gardner_private_proxy_ptv_gnomad_absent_ac1`: Gardner primary-style private proxy: LOFTEE high confidence, CADD v1.7 PHRED > 25, not last exon/intron, absent from gnomAD v4.1, and 1000G unrelated EUR AC <= 1.
+- `gardner_core_ptv_gnomad1e3_ac1`: Gardner-style strict PTV mask with gnomAD AF < 1e-3. Gardner et al.'s primary burden was private/singleton; the gnomAD AF thresholds are rare-threshold sensitivity tiers.
 - `rare_pli30_ptv_gnomad1e3_ac1`: broad rare PTV with pLI > 0.3.
 - `modern_pli90_ptv_gnomad1e3_ac1`: Gardner-style constrained-gene sensitivity tier with pLI >= 0.9.
 
@@ -136,6 +167,35 @@ The `s_het` score is computed per sample and tier as:
 ```
 
 Multiple qualifying variants in the same gene count once for `s_het` burden.
+
+## PTV Definitions
+
+The pipeline separates the base molecular definition of a protein-truncating
+variant from extra filters intended to enrich for clinical or complex-trait
+impact. The base broad PTV consequence set is:
+
+```text
+stop_gained, frameshift_variant, splice_acceptor_variant, splice_donor_variant
+```
+
+The implemented tiers map to the literature masks as follows:
+
+| Definition | Paper motivation | Implemented tier | Criteria |
+| --- | --- | --- | --- |
+| Broad rare PTV | Baseline consequence-only mask used before stricter impact filters | `broad_ptv_gnomad1e3_ac1`, `broad_ptv_gnomad1e4_ac1`, `broad_ptv_gnomad1e5_ac1` | Broad PTV consequences, 1000G unrelated EUR AC <= 1, and gnomAD AF below the tier threshold. |
+| Ganna-style constrained disruptive variant | Ganna et al. studied ultra-rare disruptive variants in highly constrained genes, with brain-expression sensitivity analyses. | `chen_broad_ptv_gnomad1e5_ac1_pli90` is the closest current constrained broad-PTV mask. | Broad PTV consequences, gnomAD AF < 1e-5, 1000G unrelated EUR AC <= 1, pLI >= 0.9. GTEx CNS expression percentiles are reported rather than used as a hard filter. |
+| Chen-style constrained rare PTV | Chen et al. defined rare PTVs from VEP stop-gain/splice-disruptive/frameshift consequences, used UKB MAF < 1e-5, and stratified genes by pLI >= 0.9. | `chen_broad_ptv_gnomad1e5_ac1_pli90` | Broad PTV consequences, gnomAD AF < 1e-5 as the public-reference proxy for UKB MAF < 1e-5, 1000G unrelated EUR AC <= 1, pLI >= 0.9, no CADD requirement. |
+| LOFTEE high-confidence constrained rare PTV | Tian et al. and van den Berg et al. use rare PTV masks with LOFTEE high-confidence filtering and pLI-stratified burden analyses. | `hc_ptv_gnomad1e5_ac1_pli90` | Broad PTV consequences, LOFTEE HC, gnomAD AF < 1e-5, 1000G unrelated EUR AC <= 1, pLI >= 0.9, no CADD requirement. |
+| Gardner primary-style private PTV proxy | Gardner et al.'s primary burden used private/singleton deleterious variants with stricter PTV filters and `s_het` burden aggregation. | `gardner_private_proxy_ptv_gnomad_absent_ac1` | Broad PTV consequences, LOFTEE HC, CADD v1.7 PHRED > 25, not last exon/intron, absent from gnomAD v4.1, and 1000G unrelated EUR AC <= 1. This is a public-reference proxy, not an exact UK Biobank-private mask. |
+| Gardner-style rare-threshold sensitivity PTV | Gardner et al. also reported rare-threshold sensitivity analyses at MAF < 1e-3, < 1e-4, and < 1e-5. | `gardner_core_ptv_gnomad1e3_ac1`, `gardner_core_ptv_gnomad1e4_ac1`, `gardner_core_ptv_gnomad1e5_ac1` | Broad PTV consequences, LOFTEE HC, CADD v1.7 PHRED > 25, not last exon/intron, 1000G unrelated EUR AC <= 1, and gnomAD AF below the tier threshold. These tiers are expected to produce larger burden distributions than the private proxy. |
+| pLI 0.3 sensitivity tier | A more permissive constrained-gene screen requested for broader phenotype relevance. | `rare_pli30_ptv_gnomad1e3_ac1` | Broad PTV consequences, gnomAD AF < 1e-3, 1000G unrelated EUR AC <= 1, pLI > 0.3. |
+
+Two implementation details differ from exact paper reproductions. First, this
+reference panel uses public 1000G and gnomAD frequencies, so `gnomAD AF < 1e-5`
+is a proxy for study-internal UK Biobank MAF thresholds. Second, the parser
+retains PTV transcript consequences emitted by VEP/LOFTEE and records canonical
+and MANE annotations, but the tier table does not currently enforce a
+canonical-only or MANE-only transcript mask.
 
 ## Data Sources
 
@@ -259,10 +319,21 @@ The generated reference package is written to:
 results/reference_package/
 ```
 
+The repository also includes a precomputed public example package at:
+
+```text
+example-outputs/reference_package/
+```
+
+This example package was generated from the full autosomal 1000G unrelated EUR
+reference run and can be used immediately for inspection, tutorials, or
+downstream comparison without rerunning the full workflow.
+
 Important files:
 
 - `burden_by_sample.tsv.gz`
 - `qualifying_variants_by_tier.tsv.gz`
+- `gene_scores_shet_constraint_expression.tsv`
 - `reference_distribution.tier_summary.tsv`
 - `reference_distribution.top_carriers.tsv`
 - `reference_distribution.summary.json`
@@ -318,3 +389,13 @@ This workflow is a modernized implementation of rare PTV burden ideas from:
 - Gardner EJ, Neville MDC, Samocha KE, et al. Reduced reproductive success is
   associated with selective constraint on human genes. Nature.
   2022;603:858-863. doi:10.1038/s41586-022-04549-9.
+- Chen C-Y, et al. The impact of rare protein coding genetic variation on adult
+  cognitive function. Nature Genetics. 2023;55:927-938.
+  doi:10.1038/s41588-023-01398-8.
+- Tian R, Ge T, Kweon H, et al. Whole-exome sequencing in UK Biobank reveals
+  rare genetic architecture for depression. Nature Communications.
+  2024;15:1755. doi:10.1038/s41467-024-45774-2.
+- van den Berg DM, Huang W, Malawsky DS, et al. Imputation of fluid
+  intelligence scores reduces ascertainment bias and increases power for
+  analyses of common and rare variants. medRxiv. 2025.
+  doi:10.1101/2025.06.18.25329418.

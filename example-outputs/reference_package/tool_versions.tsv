@@ -1,0 +1,11 @@
+tool	version
+pipeline	kgp-ptv-shet-burden
+bash	GNU bash, version 5.1.16(1)-release (x86_64-pc-linux-gnu)
+python	Python 3.12.13
+bcftools	bcftools 1.23.1
+tabix	tabix (htslib) 1.23.1
+samtools	
+plink2	PLINK v2.0.0-a.6.32LM AVX2 AMD (10 Jan 2026)
+vep	#----------------------------------#
+cadd	v1.7
+gnomad	v4.1 joint

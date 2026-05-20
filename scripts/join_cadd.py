@@ -47,7 +47,7 @@ def query_cadd(path: Path, chrom: str, pos: str, ref: str, alt: str) -> tuple[st
 
 
 def fetch_cadd_api_json(url: str) -> object | None:
-    request = urllib.request.Request(url, headers={"User-Agent": "ptv-workbox/0.1"})
+    request = urllib.request.Request(url, headers={"User-Agent": "rare-ptv-burden-reference/0.1"})
     for attempt in range(5):
         try:
             with urllib.request.urlopen(request, timeout=60) as response:

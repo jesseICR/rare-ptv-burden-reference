@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -23,19 +24,26 @@ def main() -> None:
     parser.add_argument("--chromosomes", required=True)
     parser.add_argument("--gnomad-dir", required=True)
     parser.add_argument("--kgp-dir", required=True)
+    parser.add_argument("--tiers", default=str(Path(__file__).resolve().parents[1] / "config" / "tiers.tsv"))
     parser.add_argument("--out-dir", required=True)
     args = parser.parse_args()
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    tiers_out = out_dir / "tiers.tsv"
+    if Path(args.tiers).resolve() != tiers_out.resolve():
+        shutil.copyfile(args.tiers, tiers_out)
+
     package_files = [
         out_dir / "tool_versions.tsv",
+        tiers_out,
         out_dir / "gene_scores_shet_constraint_expression.tsv",
         out_dir / "qualifying_variants_by_tier.tsv.gz",
         out_dir / "burden_by_sample.tsv.gz",
         out_dir / "reference_distribution.tier_summary.tsv",
         out_dir / "reference_distribution.top_carriers.tsv",
         out_dir / "reference_distribution.summary.json",
+        out_dir / "README.md",
     ]
     checksums = []
     for path in package_files:
@@ -55,7 +63,7 @@ def main() -> None:
         "gnomad_input_name": Path(args.gnomad_dir).name,
         "kgp_input_name": Path(args.kgp_dir).name,
         "cadd_version": "1.7",
-        "ptv_tiers": "config/tiers.tsv",
+        "ptv_tiers": "tiers.tsv",
         "checksums": checksums,
         "note": "Research reference distribution; not a validated clinical score.",
     }

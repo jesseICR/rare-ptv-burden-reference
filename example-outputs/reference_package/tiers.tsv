@@ -1,0 +1,13 @@
+tier	ptv_consequences	gnomad_af_lt	kgp_eur_ac_lte	require_loftee_hc	require_cadd_gt	require_not_last_exon_or_intron	pli_min	require_gnomad_absent	description
+broad_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	0	0	0			rare broad PTV
+broad_ptv_gnomad1e4_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.0001	1	0	0	0			rare broad PTV AF 1e-4
+broad_ptv_gnomad1e5_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.00001	1	0	0	0			rare broad PTV AF 1e-5
+chen_broad_ptv_gnomad1e5_ac1_pli90	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.00001	1	0	0	0	0.9		Chen-style broad rare PTV in pLI >= 0.9 genes
+loftee_hc_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	1	0	1			rare LOFTEE HC PTV
+hc_ptv_gnomad1e5_ac1_pli90	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.00001	1	1	0	0	0.9		LOFTEE HC rare PTV in pLI >= 0.9 genes
+gardner_private_proxy_ptv_gnomad_absent_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant		1	1	25	1		1	Gardner primary-style private proxy: strict PTV absent from gnomAD and singleton in 1000G EUR
+gardner_core_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	1	25	1			Gardner-style strict PTV, rare-threshold sensitivity AF 1e-3
+gardner_core_ptv_gnomad1e4_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.0001	1	1	25	1			Gardner-style strict PTV, rare-threshold sensitivity AF 1e-4
+gardner_core_ptv_gnomad1e5_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.00001	1	1	25	1			Gardner-style strict PTV, rare-threshold sensitivity AF 1e-5
+rare_pli30_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	0	0	0	0.3		rare broad PTV in pLI > 0.3 genes
+modern_pli90_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	1	25	1	0.9		Gardner-style constrained-gene sensitivity tier
