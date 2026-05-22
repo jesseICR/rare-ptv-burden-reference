@@ -7,9 +7,9 @@
       "sha256": "e8bec324852768e7ecc7deeaa646a3243dc366c2524fcdfca923ac944863b3a8"
     },
     {
-      "bytes": 2168,
+      "bytes": 2356,
       "path": "example-outputs/reference_package/tiers.tsv",
-      "sha256": "e6a01823d87c30057e047229e81df2df1535a470e61d7896e367d3db1415e856"
+      "sha256": "b899b4df7411a2fa76359bb868cdeea8ccceccad903ec9b45ba4c77f0cf23d93"
     },
     {
       "bytes": 7387751,
@@ -17,29 +17,29 @@
       "sha256": "ee69e1e4610f83f4b0e5d3d3938ba65b821f298eff3e0109895ed5c767624f82"
     },
     {
-      "bytes": 496546,
+      "bytes": 357972,
       "path": "example-outputs/reference_package/qualifying_variants_by_tier.tsv.gz",
-      "sha256": "c8c537ab717aa6f5dc4d994d54915dd7d1bf21f7972d656aab784338945a11b3"
+      "sha256": "28439cc7fbde9af6493a75939975f19e7b1bad2efe9de8331f6899c7c0ceb522"
     },
     {
-      "bytes": 167331,
+      "bytes": 161141,
       "path": "example-outputs/reference_package/burden_by_sample.tsv.gz",
-      "sha256": "f542e94d2eb07e278e0fdd4907ef86543b9f16b76365170567912399df1039df"
+      "sha256": "a6de6cf4f066c391e8fc8edd407ec56d58429ab8c6b958fa8d356e66ab9d28c3"
     },
     {
-      "bytes": 3117,
+      "bytes": 3334,
       "path": "example-outputs/reference_package/reference_distribution.tier_summary.tsv",
-      "sha256": "a2baed6a6417b6f25cedae88c4638bc9fd2c9bef89bbdb6d851b67ae33d0fac1"
+      "sha256": "e11dd6b4c6a3aaac900df8ee82033908ee634acf5980dcfb287c48eb71e58764"
     },
     {
-      "bytes": 16368,
+      "bytes": 17310,
       "path": "example-outputs/reference_package/reference_distribution.top_carriers.tsv",
-      "sha256": "407b7d7ae896e0a147fb5a099514222964ecbae830324e7c18465f6ca56f970b"
+      "sha256": "2414841dd28e04a088d0b971a80f75a9e15ff1262b8d4b269d00044ef24401b9"
     },
     {
-      "bytes": 10316,
+      "bytes": 11155,
       "path": "example-outputs/reference_package/reference_distribution.summary.json",
-      "sha256": "7b249270daf47706e2285d0f0d70b60c21fe9ca57722134638f8bf1094b3e970"
+      "sha256": "8aecb4a4e738ae45c4ef1143cc11c7920897ed2f6fdd86af072b1748c11e52e7"
     },
     {
       "bytes": 1005,
@@ -48,10 +48,18 @@
     }
   ],
   "chromosomes": "1-22",
-  "created_utc": "2026-05-20T20:47:34.297456+00:00",
+  "created_utc": "2026-05-22T14:26:20.095924+00:00",
   "genome_build": "GRCh38",
   "gnomad_input_name": "gnomad",
   "gnomad_version": "4.1",
+  "kgp_genotype_qc": {
+    "het_ab_max": "0.8",
+    "het_ab_min": "0.2",
+    "min_dp": "10",
+    "min_gq": "20",
+    "require_het_ab": "0",
+    "require_site_pass": "1"
+  },
   "kgp_input_name": "1000g",
   "note": "Research reference distribution; not a validated clinical score.",
   "ptv_tiers": "tiers.tsv"

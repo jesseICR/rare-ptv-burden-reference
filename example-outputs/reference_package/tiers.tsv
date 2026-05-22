@@ -9,5 +9,6 @@ gardner_private_proxy_ptv_gnomad_absent_ac1	stop_gained,frameshift_variant,splic
 gardner_core_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	1	25	1			Gardner-style strict PTV, rare-threshold sensitivity AF 1e-3
 gardner_core_ptv_gnomad1e4_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.0001	1	1	25	1			Gardner-style strict PTV, rare-threshold sensitivity AF 1e-4
 gardner_core_ptv_gnomad1e5_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.00001	1	1	25	1			Gardner-style strict PTV, rare-threshold sensitivity AF 1e-5
+gardner_core_ptv_gnomad2e6_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.000002	1	1	25	1			Gardner-style strict PTV, rare-threshold sensitivity AF 2e-6
 rare_pli30_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	0	0	0	0.3		rare broad PTV in pLI > 0.3 genes
 modern_pli90_ptv_gnomad1e3_ac1	stop_gained,frameshift_variant,splice_acceptor_variant,splice_donor_variant	0.001	1	1	25	1	0.9		Gardner-style constrained-gene sensitivity tier

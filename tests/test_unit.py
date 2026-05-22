@@ -63,7 +63,7 @@ def test_parse_ac_tier_and_burden(tmp_path: Path) -> None:
                 "##fileformat=VCFv4.2",
                 '##INFO=<ID=CSQ,Number=.,Type=String,Description="Consequence annotations from Ensembl VEP. Format: Allele|Consequence|Gene|SYMBOL|Feature|CANONICAL|MANE_SELECT|BIOTYPE|EXON|INTRON|LoF|LoF_filter|LoF_flags">',
                 "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tS1\tS2",
-                "chr22\t100\t.\tC\tT\t.\tPASS\tCSQ=T|stop_gained|ENSG000001.2|GENE1|ENST1|YES||protein_coding|2/3||HC||\tGT\t0/1\t0/0",
+                "chr22\t100\t.\tC\tT\t.\tPASS\tCSQ=T|stop_gained|ENSG000001.2|GENE1|ENST1|YES||protein_coding|2/3||HC||\tGT:GQ:DP:AB\t0/1:99:42:0.5\t0/0:99:40:.",
                 "",
             ]
         )
@@ -99,7 +99,7 @@ def test_parse_ac_tier_and_burden(tmp_path: Path) -> None:
 
     annotated = tmp_path / "annotated.tsv.gz"
     rows = ac_rows
-    rows[0]["gnomad_af_selected"] = "0.0001"
+    rows[0]["gnomad_af_selected"] = "0.000001"
     rows[0]["cadd_phred"] = "31"
     rows[0]["cadd_version"] = "1.7"
     with gzip.open(annotated, "wt") as handle:
@@ -130,7 +130,32 @@ def test_parse_ac_tier_and_burden(tmp_path: Path) -> None:
     qrows = read_tsv(qualifying)
     tiers = {r["tier"] for r in qrows}
     assert "gardner_core_ptv_gnomad1e3_ac1" in tiers
+    assert "gardner_core_ptv_gnomad2e6_ac1" in tiers
     assert "rare_pli30_ptv_gnomad1e3_ac1" in tiers
+
+    boundary = tmp_path / "annotated_boundary.tsv.gz"
+    rows[0]["gnomad_af_selected"] = "0.000002"
+    with gzip.open(boundary, "wt") as handle:
+        writer = csv.DictWriter(handle, delimiter="\t", fieldnames=list(rows[0].keys()), lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(rows)
+    boundary_qualifying = tmp_path / "boundary_qualifying.tsv.gz"
+    run(
+        "python3",
+        "scripts/apply_ptv_tiers.py",
+        "--annotations",
+        str(boundary),
+        "--carriers",
+        str(carriers),
+        "--gene-scores",
+        str(gene_scores),
+        "--tiers",
+        "config/tiers.tsv",
+        "--out",
+        str(boundary_qualifying),
+    )
+    boundary_tiers = {r["tier"] for r in read_tsv(boundary_qualifying)}
+    assert "gardner_core_ptv_gnomad2e6_ac1" not in boundary_tiers
 
     metadata = tmp_path / "metadata.tsv"
     metadata.write_text("sample_id\tpopulation\tsuperpopulation\tsex\trelatedness_filter\nS1\tGBR\tEUR\t1\ttest\nS2\tGBR\tEUR\t2\ttest\n")
@@ -151,3 +176,65 @@ def test_parse_ac_tier_and_burden(tmp_path: Path) -> None:
     target = [r for r in brows if r["sample_id"] == "S1" and r["tier"] == "gardner_core_ptv_gnomad1e3_ac1"][0]
     assert target["n_qualifying_genes"] == "1"
     assert abs(float(target["shet_burden"]) - 0.12) < 1e-9
+
+
+def test_1000g_qc_filters_site_genotype_and_optional_ab(tmp_path: Path) -> None:
+    vcf = tmp_path / "qc.vcf"
+    vcf.write_text(
+        "\n".join(
+            [
+                "##fileformat=VCFv4.2",
+                '##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">',
+                '##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">',
+                '##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth">',
+                '##FORMAT=<ID=AB,Number=1,Type=Float,Description="Allele balance">',
+                "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tS1\tS2",
+                "chr22\t100\t.\tC\tT\t.\tPASS\t.\tGT:GQ:DP:AB\t0/1:99:30:0.5\t0/0:99:30:.",
+                "chr22\t101\t.\tC\tA\t.\tLowQual\t.\tGT:GQ:DP:AB\t0/1:99:30:0.5\t0/0:99:30:.",
+                "chr22\t102\t.\tC\tG\t.\tPASS\t.\tGT:GQ:DP:AB\t0/1:10:30:0.5\t0/0:99:30:.",
+                "chr22\t103\t.\tC\tA\t.\tPASS\t.\tGT:GQ:DP:AB\t0/1:99:30:.\t0/0:99:30:.",
+                "chr22\t104\t.\tC\tG\t.\tPASS\t.\tGT:GQ:DP:AB\t0/1:99:30:0.9\t0/0:99:30:.",
+                "",
+            ]
+        )
+    )
+    parsed = tmp_path / "parsed.tsv.gz"
+    parsed_rows = [
+        {"variant_id": "chr22:100:C:T", "is_candidate_ptv": "1"},
+        {"variant_id": "chr22:101:C:A", "is_candidate_ptv": "1"},
+        {"variant_id": "chr22:102:C:G", "is_candidate_ptv": "1"},
+        {"variant_id": "chr22:103:C:A", "is_candidate_ptv": "1"},
+        {"variant_id": "chr22:104:C:G", "is_candidate_ptv": "1"},
+    ]
+    with gzip.open(parsed, "wt") as handle:
+        writer = csv.DictWriter(handle, delimiter="\t", fieldnames=["variant_id", "is_candidate_ptv"], lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(parsed_rows)
+    samples = tmp_path / "samples.txt"
+    samples.write_text("S1\nS2\n")
+    ac = tmp_path / "ac.tsv.gz"
+    carriers = tmp_path / "carriers.tsv.gz"
+    run(
+        "python3",
+        "scripts/compute_1000g_ac.py",
+        "--vcf",
+        str(vcf),
+        "--parsed",
+        str(parsed),
+        "--samples",
+        str(samples),
+        "--out-variants",
+        str(ac),
+        "--out-carriers",
+        str(carriers),
+    )
+
+    ac_by_variant = {row["variant_id"]: row for row in read_tsv(ac)}
+    assert ac_by_variant["chr22:100:C:T"]["AC_1000G_EUR_unrelated"] == "1"
+    assert ac_by_variant["chr22:101:C:A"]["kgp_site_qc_pass"] == "0"
+    assert ac_by_variant["chr22:101:C:A"]["AC_1000G_EUR_unrelated"] == "0"
+    assert ac_by_variant["chr22:102:C:G"]["N_1000G_EUR_unrelated_carrier_qc_fail"] == "1"
+    assert ac_by_variant["chr22:104:C:G"]["N_1000G_EUR_unrelated_carrier_qc_fail"] == "1"
+
+    carrier_ids = {row["variant_id"] for row in read_tsv(carriers)}
+    assert carrier_ids == {"chr22:100:C:T", "chr22:103:C:A"}

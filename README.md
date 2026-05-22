@@ -147,7 +147,7 @@ third-party resources. They are intentionally stored under ignored `tools/` and
 
 ## Main Definitions
 
-The default rare PTV definitions use VEP/LOFTEE annotations, 1000G unrelated EUR allele count, gnomAD v4.1 external allele frequency, CADD v1.7 PHRED, pLI, and optional GTEx brain/CNS expression percentiles.
+The default rare PTV definitions use VEP/LOFTEE annotations, QC-filtered 1000G unrelated EUR allele count, gnomAD v4.1 external allele frequency, CADD v1.7 PHRED, pLI, and optional GTEx brain/CNS expression percentiles.
 
 Key tiers include:
 
@@ -156,7 +156,7 @@ Key tiers include:
 - `chen_broad_ptv_gnomad1e5_ac1_pli90`: broad PTV, gnomAD AF < 1e-5, 1000G unrelated EUR AC <= 1, and pLI >= 0.9.
 - `hc_ptv_gnomad1e5_ac1_pli90`: LOFTEE high-confidence PTV, gnomAD AF < 1e-5, 1000G unrelated EUR AC <= 1, and pLI >= 0.9.
 - `gardner_private_proxy_ptv_gnomad_absent_ac1`: Gardner primary-style private proxy: LOFTEE high confidence, CADD v1.7 PHRED > 25, not last exon/intron, absent from gnomAD v4.1, and 1000G unrelated EUR AC <= 1.
-- `gardner_core_ptv_gnomad1e3_ac1`: Gardner-style strict PTV mask with gnomAD AF < 1e-3. Gardner et al.'s primary burden was private/singleton; the gnomAD AF thresholds are rare-threshold sensitivity tiers.
+- `gardner_core_ptv_gnomad1e3_ac1`, `gardner_core_ptv_gnomad1e4_ac1`, `gardner_core_ptv_gnomad1e5_ac1`, `gardner_core_ptv_gnomad2e6_ac1`: Gardner-style strict PTV masks with gnomAD AF < 1e-3, < 1e-4, < 1e-5, and < 2e-6. Gardner et al.'s primary burden was private/singleton; the gnomAD AF thresholds are rare-threshold sensitivity tiers.
 - `rare_pli30_ptv_gnomad1e3_ac1`: broad rare PTV with pLI > 0.3.
 - `modern_pli90_ptv_gnomad1e3_ac1`: Gardner-style constrained-gene sensitivity tier with pLI >= 0.9.
 
@@ -167,6 +167,12 @@ The `s_het` score is computed per sample and tier as:
 ```
 
 Multiple qualifying variants in the same gene count once for `s_het` burden.
+
+1000G carrier calls are filtered before allele counts and carrier rows are
+computed. By default, a site must have `FILTER=PASS`, each counted genotype
+must have `GQ >= 20` and `DP >= 10`, and heterozygous `AB` must be between
+0.2 and 0.8 when the `AB` field is present. Missing `AB` does not fail a call
+unless `KGP_REQUIRE_HET_AB=1` is set.
 
 ## PTV Definitions
 
@@ -187,7 +193,7 @@ The implemented tiers map to the literature masks as follows:
 | Chen-style constrained rare PTV | Chen et al. defined rare PTVs from VEP stop-gain/splice-disruptive/frameshift consequences, used UKB MAF < 1e-5, and stratified genes by pLI >= 0.9. | `chen_broad_ptv_gnomad1e5_ac1_pli90` | Broad PTV consequences, gnomAD AF < 1e-5 as the public-reference proxy for UKB MAF < 1e-5, 1000G unrelated EUR AC <= 1, pLI >= 0.9, no CADD requirement. |
 | LOFTEE high-confidence constrained rare PTV | Tian et al. and van den Berg et al. use rare PTV masks with LOFTEE high-confidence filtering and pLI-stratified burden analyses. | `hc_ptv_gnomad1e5_ac1_pli90` | Broad PTV consequences, LOFTEE HC, gnomAD AF < 1e-5, 1000G unrelated EUR AC <= 1, pLI >= 0.9, no CADD requirement. |
 | Gardner primary-style private PTV proxy | Gardner et al.'s primary burden used private/singleton deleterious variants with stricter PTV filters and `s_het` burden aggregation. | `gardner_private_proxy_ptv_gnomad_absent_ac1` | Broad PTV consequences, LOFTEE HC, CADD v1.7 PHRED > 25, not last exon/intron, absent from gnomAD v4.1, and 1000G unrelated EUR AC <= 1. This is a public-reference proxy, not an exact UK Biobank-private mask. |
-| Gardner-style rare-threshold sensitivity PTV | Gardner et al. also reported rare-threshold sensitivity analyses at MAF < 1e-3, < 1e-4, and < 1e-5. | `gardner_core_ptv_gnomad1e3_ac1`, `gardner_core_ptv_gnomad1e4_ac1`, `gardner_core_ptv_gnomad1e5_ac1` | Broad PTV consequences, LOFTEE HC, CADD v1.7 PHRED > 25, not last exon/intron, 1000G unrelated EUR AC <= 1, and gnomAD AF below the tier threshold. These tiers are expected to produce larger burden distributions than the private proxy. |
+| Gardner-style rare-threshold sensitivity PTV | Gardner et al. also reported rare-threshold sensitivity analyses at MAF < 1e-3, < 1e-4, and < 1e-5; this pipeline adds a stricter < 2e-6 sensitivity tier. | `gardner_core_ptv_gnomad1e3_ac1`, `gardner_core_ptv_gnomad1e4_ac1`, `gardner_core_ptv_gnomad1e5_ac1`, `gardner_core_ptv_gnomad2e6_ac1` | Broad PTV consequences, LOFTEE HC, CADD v1.7 PHRED > 25, not last exon/intron, 1000G unrelated EUR AC <= 1, and gnomAD AF below the tier threshold. These tiers are expected to produce larger burden distributions than the private proxy. |
 | pLI 0.3 sensitivity tier | A more permissive constrained-gene screen requested for broader phenotype relevance. | `rare_pli30_ptv_gnomad1e3_ac1` | Broad PTV consequences, gnomAD AF < 1e-3, 1000G unrelated EUR AC <= 1, pLI > 0.3. |
 
 Two implementation details differ from exact paper reproductions. First, this
@@ -294,7 +300,7 @@ whose names contain `Brain`.
 6. Extract and normalize candidate chr-level variants from raw 1000G VCFs.
 7. Run VEP and LOFTEE.
 8. Parse PTV transcript consequences.
-9. Compute unrelated EUR allele counts and carriers.
+9. Compute QC-filtered unrelated EUR allele counts and carriers.
 10. Query gnomAD only for PTVs with 1000G unrelated EUR AC <= 1.
 11. Query CADD v1.7 only for variants passing earlier rarity filters.
 12. Apply tier definitions.
@@ -363,6 +369,9 @@ Sparse singleton tiers are expected to have many zero-burden samples.
 
 - Use the raw 20201028 1000G high-coverage genotype VCFs for singleton/AC<=1 work.
 - Do not use the phased high-coverage panel for singleton analyses; that panel removes singleton variants.
+- 1000G genotype QC defaults are controlled by `KGP_REQUIRE_SITE_PASS`,
+  `KGP_MIN_GQ`, `KGP_MIN_DP`, `KGP_HET_AB_MIN`, `KGP_HET_AB_MAX`, and
+  `KGP_REQUIRE_HET_AB` in `config/default.env`.
 - CADD defaults to v1.7 GRCh38. Lookup is performed only after earlier filters have reduced the variant set. Local CADD tables are recommended for full autosome runs.
 - LOFTEE high-confidence calls require the GRCh38 GERP bigWig and ancestral
   FASTA; `scripts/download_loftee_aux.sh` downloads those files.

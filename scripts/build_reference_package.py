@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -62,6 +63,14 @@ def main() -> None:
         "gnomad_version": "4.1",
         "gnomad_input_name": Path(args.gnomad_dir).name,
         "kgp_input_name": Path(args.kgp_dir).name,
+        "kgp_genotype_qc": {
+            "require_site_pass": os.environ.get("KGP_REQUIRE_SITE_PASS", "1"),
+            "min_gq": os.environ.get("KGP_MIN_GQ", "20"),
+            "min_dp": os.environ.get("KGP_MIN_DP", "10"),
+            "het_ab_min": os.environ.get("KGP_HET_AB_MIN", "0.2"),
+            "het_ab_max": os.environ.get("KGP_HET_AB_MAX", "0.8"),
+            "require_het_ab": os.environ.get("KGP_REQUIRE_HET_AB", "0"),
+        },
         "cadd_version": "1.7",
         "ptv_tiers": "tiers.tsv",
         "checksums": checksums,
